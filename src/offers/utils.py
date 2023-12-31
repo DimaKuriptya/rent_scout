@@ -4,7 +4,20 @@ from bs4 import BeautifulSoup
 
 
 def olx_handler(data):
-    return 'olx'
+    cards_list = data.find_all('a', class_='css-rc5s2u')
+    offers_list = []
+    for card in cards_list:
+        attrs = {}
+        attrs['link'] = 'https://www.olx.ua' + card.get('href')
+        attrs['title'] = card.find('h6').text
+        location_date = card.find('p', attrs={'data-testid': 'location-date'}).text.split(' - ')
+        attrs['location'] = location_date[0]
+        attrs['date'] = location_date[1]
+        attrs['area'] = card.find('span').text
+        attrs['price'] = card.find('p', attrs={'data-testid': 'ad-price'}).text
+        attrs['image_link'] = card.find('img').get('src') 
+        offers_list.append(attrs)
+    return offers_list
 
 
 def dim_ria_handler(data):
@@ -16,16 +29,16 @@ def rieltor_handler(data):
 
 
 rent_sites = {
-    'olx': ('https://www.olx.ua/uk/nedvizhimost/kvartiry/dolgosrochnaya-arenda-kvartir/kiev/?currency=UAH', olx_handler),
-    'dim_ria': ('https://dom.ria.com/uk/arenda-kvartir/kiev/', dim_ria_handler),
-    'rieltor': ('https://rieltor.ua/kiev/flats-rent/', rieltor_handler)
+    'olx': (olx_handler, 'https://www.olx.ua/uk/nedvizhimost/kvartiry/dolgosrochnaya-arenda-kvartir/kiev/?currency=UAH&search%5Border%5D=created_at:desc'),
+    # 'dim_ria': ('https://dom.ria.com/uk/arenda-kvartir/kiev/', dim_ria_handler),
+    # 'rieltor': ('https://rieltor.ua/kiev/flats-rent/', rieltor_handler)
 }
 
 
-async def fetch_data(url, handler, session):
+async def fetch_data(handler, url, session):
     async with session.get(url) as response:
         result = await response.text()
-    raw_data = BeautifulSoup(result)
+    raw_data = BeautifulSoup(result, features="html.parser")
     ready_data = handler(raw_data)
     return ready_data
 
@@ -36,7 +49,7 @@ async def main():
         for site in rent_sites:
             tasks.append(fetch_data(rent_sites[site][0], rent_sites[site][1], session))
         res = await asyncio.gather(*tasks)
-    return ' | '.join(res)
+    return res[0]
 
 
 def get_data():
