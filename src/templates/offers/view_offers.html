@@ -1,11 +1,11 @@
 {% for offer in data %}
 <div style="margin-bottom: 40px;">
     <p>Назва: {{ offer.title }}</p>
-    <p>Посилання: {{ offer.link }}</p>
+    <p>Посилання: <a href="{{ offer.link }}">{{ offer.link }}</a></p>
     <p>Розташування: {{ offer.location }}</p>
     <p>Розміщено: {{ offer.date }}</p>
-    <p>Площа: {{ offer.area }}</p>
+    <p>Площа: {{ offer.area }} м²</p>
     <p>Ціна: {{ offer.price }}</p>
-    <p>Зображення: {{ offer.image_link }}</p>
+    <p>Зображення: <a href="{{ offer.image_link }}">{{ offer.image_link }}</a></p>
 </div>
 {% endfor %}
