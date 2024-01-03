@@ -1,3 +1,4 @@
+{% load humanize %}
 {% for offer in data %}
 <div style="margin-bottom: 40px;">
     <p>Назва: {{ offer.title }}</p>
@@ -5,7 +6,7 @@
     <p>Розташування: {{ offer.location }}</p>
     <p>Розміщено: {{ offer.date }}</p>
     <p>Площа: {{ offer.area }} м²</p>
-    <p>Ціна: {{ offer.price }}</p>
+    <p>Ціна: {{ offer.price|intcomma }} грн.</p>
     <p>Зображення: <a href="{{ offer.image_link }}">{{ offer.image_link }}</a></p>
 </div>
 {% endfor %}
